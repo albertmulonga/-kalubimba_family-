@@ -56,16 +56,13 @@ export default async function VideosPage({
       </div>
 
       {/* Formulaire upload */}
-      <details className="card" style={{ marginBottom: 20 }}>
-        <summary className="card-head" style={{ cursor: "pointer", listStyle: "none" }}>
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div className="card-head">
           <div>
             <h2>Ajouter une vidéo</h2>
             <p>Partagez un moment filmé de la famille.</p>
           </div>
-          <span className="btn btn-primary btn-sm">
-            <Upload size={14} /> Choisir une vidéo
-          </span>
-        </summary>
+        </div>
         <form action={uploadVideoAction} className="card-body">
           <div className="form-grid">
             <div className="field span-2">
@@ -105,7 +102,7 @@ export default async function VideosPage({
             </div>
           </div>
         </form>
-      </details>
+      </div>
 
       {/* Liste des vidéos */}
       {videos.length === 0 ? (
