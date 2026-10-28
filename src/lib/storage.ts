@@ -14,7 +14,6 @@ function safeName(name: string) {
   return cleaned || "fichier";
 }
 
-// Vercel Blob fonctionne avec BLOB_READ_WRITE_TOKEN (ancien) OU OIDC (nouveau, via BLOB_STORE_ID)
 function isVercelBlob(): boolean {
   return !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 }
@@ -33,26 +32,28 @@ export async function saveUpload(
 
   if (isVercelBlob()) {
     try {
-      // Avec token explicite (ancien système)
-      if (process.env.BLOB_READ_WRITE_TOKEN) {
-        const blob = await put(key, file, {
-          access: "public",
-          token: process.env.BLOB_READ_WRITE_TOKEN,
-          addRandomSuffix: false,
-        });
-        console.log("[Blob] Upload réussi (token):", blob.url);
-        return blob.url;
-      }
-      // Avec OIDC (nouveau système Vercel — BLOB_STORE_ID présent)
-      const blob = await put(key, file, {
+      const storeId = process.env.BLOB_STORE_ID?.replace(/^"(.*)"$/, "$1");
+      const options: Parameters<typeof put>[2] = {
         access: "public",
         addRandomSuffix: false,
-      });
-      console.log("[Blob] Upload réussi (OIDC):", blob.url);
+      };
+
+      // Token explicite (ancien système)
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        (options as Record<string, unknown>).token = process.env.BLOB_READ_WRITE_TOKEN;
+      }
+
+      // Store ID explicite (nouveau système OIDC)
+      if (storeId) {
+        (options as Record<string, unknown>).storeId = storeId;
+      }
+
+      const blob = await put(key, file, options);
+      console.log("[Blob] Upload réussi:", blob.url);
       return blob.url;
     } catch (err) {
-      console.error("[Blob] Erreur upload:", err);
-      throw err;
+      console.error("[Blob] Erreur:", err);
+      // Fallback local si le blob échoue
     }
   }
 
@@ -61,7 +62,8 @@ export async function saveUpload(
   await mkdir(directory, { recursive: true });
   const bytes = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(directory, filename), bytes);
-  return key;
+  console.log("[Local] Fichier sauvegardé localement:", key);
+  return `/media/${folder}/${filename}`;
 }
 
 export async function deleteStoredFile(filePath: string | null | undefined) {
