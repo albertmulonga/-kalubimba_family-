@@ -118,21 +118,23 @@ export default async function VideosPage({
               video.member_prenom || video.member_nom
                 ? `${video.member_prenom ?? ""} ${video.member_nom ?? ""}`.trim()
                 : null;
+            const videoSrc = mediaUrl(video.video) ?? "";
+            if (!videoSrc) return null;
             return (
               <article key={video.id} className="video-card">
                 <MediaViewer
                   kind="video"
-                  src={mediaUrl(video.video) ?? ""}
+                  src={videoSrc}
                   title={video.description || "Vidéo de famille"}
                   className="video-card-frame"
                   canDelete={canDelete}
                   deleteAction={deleteVideoAction.bind(null, video.id)}
                 >
                   <video
-                    src={mediaUrl(video.video) ?? ""}
+                    src={videoSrc}
                     muted
                     playsInline
-                    preload="metadata"
+                    preload="none"
                   />
                 </MediaViewer>
                 <div className="video-card-caption">

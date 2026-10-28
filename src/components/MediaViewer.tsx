@@ -77,7 +77,11 @@ export function MediaViewer({
               onClick={(event) => event.stopPropagation()}
             >
               {kind === "video" ? (
-                <video src={src} controls autoPlay playsInline />
+                src ? (
+                  <video src={src} controls autoPlay playsInline />
+                ) : (
+                  <p style={{ color: "white", padding: "20px" }}>Vidéo indisponible</p>
+                )
               ) : (
                 <SafeImage src={src} alt={title} loading="eager" />
               )}
