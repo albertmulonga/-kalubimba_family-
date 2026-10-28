@@ -930,14 +930,16 @@
   display: flex;
   flex: 1.2;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   max-height: 92vh;
   overflow-y: auto;
   padding: 45px 40px;
 }
 
 .kf-auth-card.is-register .kf-auth-form {
-  padding: 35px;
+  padding: 30px 35px;
+  max-height: 100vh;
+  justify-content: flex-start;
 }
 
 .kf-auth-form h2 {
@@ -1294,6 +1296,13 @@
   .kf-auth-card {
     flex-direction: column;
     max-width: 430px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .kf-auth-page {
+    align-items: flex-start;
+    padding: 20px 16px 40px;
   }
 
   .kf-auth-brand {
@@ -1317,10 +1326,12 @@
   .kf-auth-form,
   .kf-auth-card.is-register .kf-auth-form {
     padding: 25px 20px;
+    max-height: none;
+    overflow-y: visible;
   }
 
-  .kf-auth-form h2 {
-    font-size: 23px;
+  .kf-auth-card.is-register .kf-auth-form {
+    padding-top: 20px;
   }
 
   .kf-auth-row {
