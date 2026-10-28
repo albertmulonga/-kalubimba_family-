@@ -1,73 +1,102 @@
-# Kalubimba Family - Application Web Laravel
+# Kalubimba Family — Application Web
 
-Application web de gestion familiale pour la famille Kalubimba.
+Application numérique de la famille Kalubimba : arbre généalogique, membres, photos, vidéos, histoires et messagerie.
 
-## 🚀 Installation Rapide
+## 🚀 Technologies
 
-### Étape 1: Installer Composer
+- **Next.js 15** (App Router, Server Components)
+- **React 19**
+- **TypeScript**
+- **PostgreSQL** (Neon / Vercel Postgres)
+- **Vercel Blob** (stockage photos et vidéos)
+- **JWT** (sessions sécurisées via `jose`)
 
-1. Téléchargez Composer: https://getcomposer.org/Composer-Setup.exe
-2. Installez-le
-3. Redémarrez PowerShell
+## ✅ Fonctionnalités
 
-### Étape 2: Installer les dépendances Laravel
+- 🔐 Authentification sécurisée (email ou matricule)
+- 👨‍👩‍👧‍👦 Gestion des membres de la famille
+- 🌳 Arbre généalogique interactif (règle patrilinéaire Kalubimba)
+- 📸 Album photos & galerie vidéos
+- 💬 Chat familial (messages privés + groupe)
+- 🕯️ Mémorial (membres décédés)
+- 📖 Histoire de la famille
+- 📋 Comptes rendus de réunion
+- 🏆 Section ancêtres
+- 📊 Tableau de bord avec statistiques
+- 📱 Responsive (mobile, tablette, desktop)
+- 🛡️ Administration des utilisateurs
 
+## 🛠️ Installation locale
+
+### Prérequis
+- Node.js 18+
+- PostgreSQL 14+ (ou compte Neon gratuit)
+
+### 1. Installer les dépendances
 ```bash
-composer install
+npm install
 ```
 
-### Étape 3: Générer la clé d'application
-
+### 2. Configurer l'environnement
 ```bash
-php artisan key:generate
+cp .env.example .env.local
+```
+Éditer `.env.local` :
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/kalubimba_family
+DATABASE_SSL=false
+AUTH_SECRET=une-chaine-aleatoire-longue
+ADMIN_EMAIL=adminkalubimba@gmail.com
 ```
 
-### Étape 4: Créer le lien de stockage
-
+### 3. Créer la base de données
 ```bash
-php artisan storage:link
+npm run db:setup
 ```
 
-### Étape 5: Lancer l'application
-
+### 4. Lancer en développement
 ```bash
-php artisan serve
+npm run dev
+```
+Ouvrir : **http://localhost:3000**
+
+## 🌐 Hébergement sur Vercel (gratuit)
+
+### Variables d'environnement requises sur Vercel :
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | URL PostgreSQL Neon (avec `?sslmode=require`) |
+| `DATABASE_SSL` | `true` |
+| `AUTH_SECRET` | Chaîne aléatoire forte (32+ caractères) |
+| `ADMIN_EMAIL` | Email de l'administrateur |
+| `BLOB_READ_WRITE_TOKEN` | Token Vercel Blob (pour photos/vidéos) |
+
+### Schéma de base de données
+Exécuter dans l'éditeur SQL de Neon :
+1. `database/postgres/01_schema.sql`
+2. `database/postgres/02_data.sql`
+
+## 👤 Compte administrateur
+
+- **Email :** adminkalubimba@gmail.com
+- **Mot de passe :** kalubimba1234
+
+## 📁 Structure du projet
+
+```
+src/
+├── app/                  # Pages Next.js (App Router)
+│   ├── (app)/            # Pages authentifiées
+│   ├── (auth)/           # Login / Register
+│   └── api/              # Routes API (appels audio/vidéo)
+├── components/           # Composants React
+└── lib/                  # Logique métier, DB, auth, actions
+database/
+└── postgres/             # Schéma SQL et données initiales
+public/                   # Assets statiques
 ```
 
-Puis ouvrez: **http://localhost:8000**
+## 📄 Licence
 
-## 📦 Base de Données
-
-La base de données MySQL `kalubimba_family` existe déjà avec:
-- Table `users` (utilisateurs)
-- Table `members` (membres de la famille)
-- Table `photos` (photos familiales)
-- Table `videos` (vidéos familiales)
-- Table `messages` (chat familial)
-
-Admin:
-- Email: adminkalubimba@gmail.com
-- Mot de passe: kalubimba1234
-
-## 🛠️ Technologies
-
-- Laravel 10.x
-- PHP 8.1+
-- MySQL 8.0+
-- Bootstrap 5.3
-- Blade Templates
-
-## 📱 Fonctionnalités
-
-- ✅ Authentification sécurisée
-- ✅ Gestion des membres de la famille
-- ✅ Arbre généalogique interactif
-- ✅ Album photos
-- ✅ Galerie vidéos
-- ✅ Chat familial
-- ✅ Section mémorial
-- ✅ Responsive (mobile, tablette, desktop)
-
-## 📝 Documentation
-
-Consultez le fichier `GUIDE_INSTALLATION_COMPOSER.md` pour plus de détails.
+Projet privé — Famille Kalubimba © 2026

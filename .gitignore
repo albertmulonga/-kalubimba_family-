@@ -1,4 +1,4 @@
-# Node / Next.js
+# ─── Node / Next.js ───────────────────────────────────────────
 /node_modules
 /.next
 /out
@@ -8,24 +8,118 @@ npm-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Environnement
+# ─── Environnement (secrets) ──────────────────────────────────
 .env
 .env.local
 .env.*.local
 .env.production
 .env.backup
 
-# Laravel (ancienne version, conservée pour référence)
-/public/build
-/public/hot
-/storage/*.key
+# ─── Fichiers legacy Laravel / PHP ────────────────────────────
 /vendor
+/bootstrap/cache
+/laravel_app
+/backend
+/backend_php
+/storage/*.key
+/public/hot
+/public/build
 /.phpunit.result.cache
 Homestead.json
 Homestead.yaml
 auth.json
+composer.phar
 
-# Divers
+# ─── Fichiers PHP racine (scripts de migration/debug) ─────────
+*.php
+artisan
+composer.json
+composer.lock
+
+# ─── Scripts batch et PowerShell legacy ───────────────────────
+*.bat
+*.ps1
+
+# ─── Fichiers SQL racine ──────────────────────────────────────
+fix_gender.sql
+verify_database.sql
+tmp_check.js
+nom
+
+# ─── Documentation legacy (garder README.md principal) ────────
+0_COMMENCER_ICI.*
+0_LIRE_EN_PREMIER.*
+AGRANDISSEMENT_*
+APPLICATION_*
+AUDIT_*
+AUTH_GUARD_*
+CAHIER_*
+CLIQUEZ_*
+COMMENCER_ICI.*
+COMMENT_*
+COMPTES_*
+CORRECTIONS_*
+CORRECTION_*
+DEMARRER_*
+DEMO_*
+ETAT_*
+FELICITATIONS.*
+FICHIERS_*
+FLUX_*
+FONCTIONNALITE_*
+GESTION_*
+GUIDE_*
+IMAGES_*
+IMPLEMENTATION_*
+INSTALLATION_*
+INSTALLER_*
+INSTRUCTIONS_*
+LANCER_*
+LISEZ_*
+LOGIQUE_*
+MIGRATION_*
+MODE_EMPLOI_*
+MODIFICATIONS_*
+OUVRIR_*
+PAGES_*
+PROBLEME_*
+RAPPORT_*
+README_*
+REGLES_*
+REGLE_*
+RESOLUTION_*
+RESTAURATION_*
+RESUME_*
+SECURITY_*
+START_HERE.*
+SUCCES_*
+TEST_*
+TOUTES_*
+TOUT_*
+TWA_*
+VERIFICATION_*
+VERIFIER_*
+
+# ─── Dossiers legacy ──────────────────────────────────────────
+/assets
+/config
+/resources
+/routes
+/storage
+/bootstrap
+/.kiro
+/database/migrations
+/database/add_family_fields.*
+
+# ─── Fichiers divers legacy ───────────────────────────────────
+index.html
+DEMO_CARTES_COUPLES.html
+CLIQUEZ_ICI_POUR_OUVRIR.html
+OUVRIR_APPLICATION.html
+test_photo.html
+TEST_DASHBOARD.html
+
+# ─── IDE ──────────────────────────────────────────────────────
 /.fleet
 /.idea
 /.vscode
