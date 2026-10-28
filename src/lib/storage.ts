@@ -1,21 +1,36 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { del, put } from "@vercel/blob";
 
 const MAX_SIZE = 50 * 1024 * 1024;
 
 function safeName(name: string) {
-  const cleaned = name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9._-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-  return cleaned || "fichier";
+  return (
+    name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "fichier"
+  );
 }
 
-function isVercelBlob(): boolean {
-  return !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+async function uploadToCloudinary(file: File, folder: string): Promise<string> {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME!;
+  const preset = process.env.CLOUDINARY_UPLOAD_PRESET!;
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", preset);
+  fd.append("folder", `kalubimba/${folder}`);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
+    { method: "POST", body: fd },
+  );
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Cloudinary: ${res.status} ${txt}`);
+  }
+  const json = (await res.json()) as { secure_url: string };
+  return json.secure_url;
 }
 
 export async function saveUpload(
@@ -23,46 +38,30 @@ export async function saveUpload(
   folder: string,
 ): Promise<string | null> {
   if (!file || typeof file === "string" || file.size === 0) return null;
-  if (file.size > MAX_SIZE) {
-    throw new Error("Le fichier dépasse la taille maximale autorisée (50 Mo).");
+  if (file.size > MAX_SIZE) throw new Error("Fichier trop volumineux (max 50 Mo).");
+
+  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET) {
+    const url = await uploadToCloudinary(file as File, folder);
+    console.log("[Cloudinary] OK:", url);
+    return url;
   }
 
-  const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName(file.name)}`;
-  const key = `${folder}/${filename}`;
-
-  if (isVercelBlob()) {
-    try {
-      const storeId = process.env.BLOB_STORE_ID?.replace(/^"(.*)"$/, "$1");
-      const options: Parameters<typeof put>[2] = {
-        access: "public",
-        addRandomSuffix: false,
-      };
-
-      // Token explicite (ancien système)
-      if (process.env.BLOB_READ_WRITE_TOKEN) {
-        (options as Record<string, unknown>).token = process.env.BLOB_READ_WRITE_TOKEN;
-      }
-
-      // Store ID explicite (nouveau système OIDC)
-      if (storeId) {
-        (options as Record<string, unknown>).storeId = storeId;
-      }
-
-      const blob = await put(key, file, options);
-      console.log("[Blob] Upload réussi:", blob.url);
-      return blob.url;
-    } catch (err) {
-      console.error("[Blob] Erreur:", err);
-      // Fallback local si le blob échoue
-    }
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { put } = await import("@vercel/blob");
+    const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName((file as File).name)}`;
+    const blob = await put(`${folder}/${filename}`, file as File, {
+      access: "public",
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      addRandomSuffix: false,
+    });
+    return blob.url;
   }
 
-  // Fallback local — stockage dans public/media
-  const directory = path.join(process.cwd(), "public", "media", folder);
-  await mkdir(directory, { recursive: true });
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(directory, filename), bytes);
-  console.log("[Local] Fichier sauvegardé localement:", key);
+  const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName((file as File).name)}`;
+  const dir = path.join(process.cwd(), "public", "media", folder);
+  await mkdir(dir, { recursive: true });
+  const bytes = Buffer.from(await (file as File).arrayBuffer());
+  await writeFile(path.join(dir, filename), bytes);
   return `/media/${folder}/${filename}`;
 }
 
@@ -70,10 +69,9 @@ export async function deleteStoredFile(filePath: string | null | undefined) {
   if (!filePath) return;
   try {
     if (/^https?:\/\//i.test(filePath)) {
-      if (process.env.BLOB_READ_WRITE_TOKEN) {
+      if (process.env.BLOB_READ_WRITE_TOKEN && filePath.includes("vercel-storage")) {
+        const { del } = await import("@vercel/blob");
         await del(filePath, { token: process.env.BLOB_READ_WRITE_TOKEN });
-      } else if (process.env.BLOB_STORE_ID) {
-        await del(filePath);
       }
       return;
     }
@@ -81,15 +79,12 @@ export async function deleteStoredFile(filePath: string | null | undefined) {
       .replace(/\\/g, "/")
       .replace(/^https?:\/\/[^/]+\//, "")
       .replace(/^\/+/, "")
-      .replace(/^media\//, "")
-      .replace(/^storage\//, "");
+      .replace(/^media\//, "");
     const localPath = path.join(process.cwd(), "public", "media", safeRelative);
     const mediaRoot = path.join(process.cwd(), "public", "media");
     if (!localPath.startsWith(mediaRoot)) return;
     await unlink(localPath);
-  } catch {
-    // Le fichier peut déjà avoir été supprimé.
-  }
+  } catch { /* ignoré */ }
 }
 
 export function stringValue(value: FormDataEntryValue | null): string | null {
