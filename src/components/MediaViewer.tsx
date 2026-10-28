@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Download, Maximize2, Play, Trash2, X } from "lucide-react";
 import { SafeImage } from "./SafeImage";
@@ -24,6 +24,12 @@ export function MediaViewer({
   deleteAction?: () => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
+  // isMounted évite le createPortal côté serveur (hydration error)
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -54,8 +60,8 @@ export function MediaViewer({
         </span>
       </button>
 
-      {open &&
-        typeof document !== "undefined" &&
+      {/* Portail uniquement côté client après hydratation */}
+      {isMounted && open &&
         createPortal(
           <div
             className="photo-lightbox"
@@ -78,7 +84,13 @@ export function MediaViewer({
             >
               {kind === "video" ? (
                 src ? (
-                  <video src={src} controls autoPlay playsInline />
+                  <video
+                    src={src}
+                    controls
+                    autoPlay
+                    playsInline
+                    style={{ maxWidth: "100%", maxHeight: "78vh", borderRadius: 12 }}
+                  />
                 ) : (
                   <p style={{ color: "white", padding: "20px" }}>Vidéo indisponible</p>
                 )
