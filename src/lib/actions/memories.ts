@@ -169,3 +169,26 @@ export async function deleteAncestorAction(ancestorId: number) {
   revalidatePath("/ancestors");
   redirect(withMessage("/ancestors", "success", "Ancêtre supprimé."));
 }
+
+export async function saveVideoUrlAction(formData: FormData) {
+  const session = await requireSession();
+  const videoUrl = stringValue(formData.get("video_url"));
+
+  if (!videoUrl || !videoUrl.startsWith("http")) {
+    redirect(withMessage("/videos", "error", "URL de vidéo invalide."));
+  }
+
+  await query(
+    `INSERT INTO videos (description, video, membre_id, utilisateur_id, date_publication, duree, created_at, updated_at)
+     VALUES ($1,$2,$3,$4, now(), $5, now(), now())`,
+    [
+      stringValue(formData.get("description")),
+      videoUrl,
+      Number(stringValue(formData.get("membre_id"))) || null,
+      session.id,
+      stringValue(formData.get("duree")),
+    ],
+  );
+
+  refreshMedia();
+}

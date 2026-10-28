@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Film, Upload, UserRound, Users } from "lucide-react";
+import { Film, UserRound, Users } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { getMembers, getVideos } from "@/lib/data";
 import { formatDate, fullName, mediaUrl } from "@/lib/format";
 import { readFlash } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { deleteVideoAction, uploadVideoAction } from "@/lib/actions/memories";
+import { VideoUploadForm } from "@/components/VideoUploadForm";
+import { deleteVideoAction } from "@/lib/actions/memories";
 
 export const metadata = { title: "Vidéos de famille" };
 
@@ -21,6 +22,9 @@ export default async function VideosPage({
   const memberParam = Array.isArray(params.member) ? params.member[0] : params.member;
   const memberId = Number(memberParam) || undefined;
   const [videos, members] = await Promise.all([getVideos(memberId), getMembers()]);
+
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME ?? "";
+  const uploadPreset = process.env.CLOUDINARY_UPLOAD_PRESET ?? "";
 
   return (
     <>
@@ -42,67 +46,21 @@ export default async function VideosPage({
             style={{ minWidth: 220 }}
           >
             <option value="">Tous les membres</option>
-            {members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {fullName(member)}
-              </option>
+            {members.map((m) => (
+              <option key={m.id} value={m.id}>{fullName(m)}</option>
             ))}
           </select>
           <button type="submit" className="btn btn-ghost">Filtrer</button>
-          {memberId && (
-            <Link href="/videos" className="btn btn-ghost">Réinitialiser</Link>
-          )}
+          {memberId && <Link href="/videos" className="btn btn-ghost">Réinitialiser</Link>}
         </form>
       </div>
 
-      {/* Formulaire upload */}
-      <div className="card" style={{ marginBottom: 20 }}>
-        <div className="card-head">
-          <div>
-            <h2>Ajouter une vidéo</h2>
-            <p>Partagez un moment filmé de la famille.</p>
-          </div>
-        </div>
-        <form action={uploadVideoAction} className="card-body">
-          <div className="form-grid">
-            <div className="field span-2">
-              <label htmlFor="video">Vidéo *</label>
-              <input
-                id="video"
-                name="video"
-                type="file"
-                accept="video/*"
-                className="input"
-                required
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="description">Description</label>
-              <input id="description" name="description" className="input" />
-            </div>
-            <div className="field">
-              <label htmlFor="duree">Durée</label>
-              <input id="duree" name="duree" className="input" placeholder="Ex. 03:45" />
-            </div>
-            <div className="field span-2">
-              <label htmlFor="membre_id">Membre associé</label>
-              <select id="membre_id" name="membre_id" className="select" defaultValue="">
-                <option value="">Aucun membre</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {fullName(member)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-actions span-2">
-              <button type="submit" className="btn btn-primary">
-                <Upload size={16} /> Publier la vidéo
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+      {/* Upload côté client — évite la limite 4.5MB de Vercel */}
+      <VideoUploadForm
+        cloudName={cloudName}
+        uploadPreset={uploadPreset}
+        members={members.map((m) => ({ id: m.id, name: fullName(m) }))}
+      />
 
       {/* Liste des vidéos */}
       {videos.length === 0 ? (
@@ -116,17 +74,11 @@ export default async function VideosPage({
           {videos.map((video) => {
             const videoSrc = mediaUrl(video.video);
             if (!videoSrc) return null;
-
             const canDelete = session.isAdmin || video.utilisateur_id === session.id;
             const uploader = [video.uploader_prenom, video.uploader_nom]
-              .filter(Boolean)
-              .join(" ")
-              .trim() || null;
+              .filter(Boolean).join(" ").trim() || null;
             const associated = [video.member_prenom, video.member_nom]
-              .filter(Boolean)
-              .join(" ")
-              .trim() || null;
-
+              .filter(Boolean).join(" ").trim() || null;
             return (
               <article key={video.id} className="video-card">
                 <VideoPlayer
@@ -140,19 +92,9 @@ export default async function VideosPage({
                     <strong>{video.description || "Vidéo de famille"}</strong>
                     <div className="video-card-meta">
                       <span>{formatDate(video.date_publication)}</span>
-                      {uploader && (
-                        <span>
-                          <UserRound size={12} /> {uploader}
-                        </span>
-                      )}
-                      {associated && (
-                        <span>
-                          <Users size={12} /> {associated}
-                        </span>
-                      )}
-                      {video.duree && (
-                        <span className="badge badge-blue">{video.duree}</span>
-                      )}
+                      {uploader && <span><UserRound size={12} /> {uploader}</span>}
+                      {associated && <span><Users size={12} /> {associated}</span>}
+                      {video.duree && <span className="badge badge-blue">{video.duree}</span>}
                     </div>
                   </div>
                 </div>
