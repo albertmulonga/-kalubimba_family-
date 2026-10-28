@@ -6,12 +6,18 @@ import {
   Pencil,
   Plus,
   ShieldCheck,
+  Trash2,
   UserPlus,
   Users,
 } from "lucide-react";
 import { age, fullName } from "@/lib/format";
 import type { MemberRow, MemberWithAccount } from "@/lib/data";
 import { ProfilePhoto } from "./ProfilePhoto";
+import { ConfirmForm } from "./ConfirmForm";
+import {
+  removeChildLinkAction,
+  removeParentLinkAction,
+} from "@/lib/actions/family";
 
 export type TreeChild = {
   member: MemberWithAccount;
@@ -127,7 +133,15 @@ function PersonCard({
   );
 }
 
-function ParentCard({ parent }: { parent: MemberRow }) {
+function ParentCard({
+  parent,
+  memberId,
+  canEdit,
+}: {
+  parent: MemberRow;
+  memberId: number;
+  canEdit: boolean;
+}) {
   const years = age(parent.date_naissance, parent.date_deces);
   return (
     <div className="tree-parent-card">
@@ -138,7 +152,7 @@ function ParentCard({ parent }: { parent: MemberRow }) {
         photo={parent.photo}
         size="lg"
       />
-      <div>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <span className="tree-role">{parentRole(parent.genre)}</span>
         <Link href={`/members/${parent.id}`} className="tree-person-name">
           {fullName(parent)}
@@ -148,6 +162,21 @@ function ParentCard({ parent }: { parent: MemberRow }) {
           {years !== null ? ` · ${years} ans` : ""}
         </span>
       </div>
+      {canEdit && (
+        <ConfirmForm
+          action={removeParentLinkAction.bind(null, memberId, parent.id)}
+          message={`Retirer ${fullName(parent)} comme parent ?`}
+        >
+          <button
+            type="submit"
+            className="icon-btn danger"
+            title="Retirer ce parent"
+            style={{ flexShrink: 0 }}
+          >
+            <Trash2 size={14} />
+          </button>
+        </ConfirmForm>
+      )}
     </div>
   );
 }
@@ -165,6 +194,7 @@ export function FamilyCore({
 }: FamilyCoreProps) {
   return (
     <div className="family-tree-grid">
+      {/* ── PARENTS ── */}
       <section className="tree-panel tree-panel-parents">
         <div className="tree-panel-head">
           <div>
@@ -177,7 +207,12 @@ export function FamilyCore({
         {parents.length > 0 ? (
           <div className="tree-parent-list">
             {parents.map((parent) => (
-              <ParentCard key={parent.id} parent={parent} />
+              <ParentCard
+                key={parent.id}
+                parent={parent}
+                memberId={mainMember.id}
+                canEdit={canEdit}
+              />
             ))}
           </div>
         ) : (
@@ -198,6 +233,7 @@ export function FamilyCore({
         )}
       </section>
 
+      {/* ── COUPLE ── */}
       <section className="tree-panel tree-panel-couple">
         <div className="tree-panel-head">
           <div>
@@ -257,6 +293,7 @@ export function FamilyCore({
         </div>
       </section>
 
+      {/* ── ENFANTS ── */}
       <section className="tree-panel tree-panel-children">
         <div className="tree-panel-head">
           <div>
@@ -299,8 +336,26 @@ export function FamilyCore({
                   </Link>
                   {entry.showCredentials && (
                     <span className="tree-private-note">
-                      <ShieldCheck size={13} /> Identifiants visibles par les parents
+                      <ShieldCheck size={13} /> Identifiants visibles
                     </span>
+                  )}
+                  {canEdit && (
+                    <ConfirmForm
+                      action={removeChildLinkAction.bind(
+                        null,
+                        entry.member.id,
+                        mainMember.id,
+                      )}
+                      message={`Retirer ${fullName(entry.member)} de vos enfants ?`}
+                    >
+                      <button
+                        type="submit"
+                        className="btn btn-danger-soft btn-sm"
+                        title="Retirer cet enfant"
+                      >
+                        <Trash2 size={13} /> Retirer
+                      </button>
+                    </ConfirmForm>
                   )}
                 </div>
               </div>

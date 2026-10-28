@@ -503,3 +503,56 @@ export async function addDeceasedAction(formData: FormData) {
   const redirectTo = targetId ? `/members/${targetId}` : "/memorial";
   redirect(withMessage(redirectTo, "success", "Personne décédée ajoutée. Elle apparaît désormais dans le mémorial."));
 }
+
+export async function removeChildLinkAction(childId: number, parentId: number) {
+  const session = await requireSession();
+  if (!(await canUpdateMember(session, parentId))) {
+    redirect(withMessage(`/family-tree`, "error", "Permission refusée."));
+  }
+
+  await transaction(async (client) => {
+    // Détacher le père ou la mère selon le parent
+    await client.query(
+      `UPDATE members SET pere_id = CASE WHEN pere_id = $1 THEN NULL ELSE pere_id END,
+         mere_id = CASE WHEN mere_id = $1 THEN NULL ELSE mere_id END,
+         updated_at = now()
+       WHERE id = $2`,
+      [parentId, childId],
+    );
+    // Supprimer le lien dans relationships
+    await client.query(
+      `DELETE FROM relationships WHERE parent_id = $1 AND child_id = $2`,
+      [parentId, childId],
+    );
+  });
+
+  revalidateFamily(parentId);
+  redirect(withMessage("/family-tree", "success", "Lien enfant supprimé."));
+}
+
+export async function removeParentLinkAction(memberId: number, parentId: number) {
+  const session = await requireSession();
+  if (!(await canUpdateMember(session, memberId))) {
+    redirect(withMessage(`/family-tree`, "error", "Permission refusée."));
+  }
+
+  await transaction(async (client) => {
+    // Détacher le parent (père ou mère)
+    await client.query(
+      `UPDATE members SET
+         pere_id = CASE WHEN pere_id = $1 THEN NULL ELSE pere_id END,
+         mere_id = CASE WHEN mere_id = $1 THEN NULL ELSE mere_id END,
+         updated_at = now()
+       WHERE id = $2`,
+      [parentId, memberId],
+    );
+    // Supprimer dans relationships
+    await client.query(
+      `DELETE FROM relationships WHERE parent_id = $1 AND child_id = $2`,
+      [parentId, memberId],
+    );
+  });
+
+  revalidateFamily(memberId);
+  redirect(withMessage("/family-tree", "success", "Lien parent supprimé."));
+}
