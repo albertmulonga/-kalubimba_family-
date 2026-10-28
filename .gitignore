@@ -1,0 +1,31 @@
+# Node / Next.js
+/node_modules
+/.next
+/out
+next-env.d.ts
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environnement
+.env
+.env.local
+.env.*.local
+.env.production
+.env.backup
+
+# Laravel (ancienne version, conservée pour référence)
+/public/build
+/public/hot
+/storage/*.key
+/vendor
+/.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Divers
+/.fleet
+/.idea
+/.vscode

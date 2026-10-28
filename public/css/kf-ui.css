@@ -1,0 +1,160 @@
+/* Kalubimba Family - Global UI (Design System) */
+
+:root{
+  --kf-bg: #F1F5F9;
+  --kf-surface: #FFFFFF;
+  --kf-surface-2: #F8FAFC;
+  --kf-text: #0F172A;
+  --kf-muted: #64748B;
+  --kf-border: #E2E8F0;
+
+  --kf-primary: #2563EB;
+  --kf-primary-2: #3B82F6;
+  --kf-success: #10B981;
+  --kf-danger: #EF4444;
+  --kf-warning: #F59E0B;
+  --kf-purple: #7C3AED;
+
+  --kf-shadow-sm: 0 1px 2px rgba(15,23,42,.06);
+  --kf-shadow-md: 0 10px 25px rgba(15,23,42,.08);
+  --kf-shadow-lg: 0 18px 45px rgba(15,23,42,.12);
+
+  --kf-radius-sm: 10px;
+  --kf-radius-md: 14px;
+  --kf-radius-lg: 20px;
+  --kf-radius-xl: 26px;
+
+  --kf-container: 1180px;
+}
+
+html,body{height:100%;}
+body{
+  background: var(--kf-bg);
+  color: var(--kf-text);
+  text-rendering: optimizeLegibility;
+}
+
+/* Page layout helpers */
+.kf-page{
+  max-width: var(--kf-container);
+  margin: 0 auto;
+}
+.kf-stack{display:flex;flex-direction:column;gap:16px;}
+.kf-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.kf-muted{color:var(--kf-muted);}
+.kf-divider{height:1px;background:var(--kf-border);width:100%;}
+
+/* Headings */
+.kf-title{
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin: 0;
+}
+.kf-subtitle{
+  margin: 0;
+  color: var(--kf-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Cards */
+.kf-card{
+  background: var(--kf-surface);
+  border: 1px solid var(--kf-border);
+  border-radius: var(--kf-radius-lg);
+  box-shadow: var(--kf-shadow-md);
+}
+.kf-card--padded{padding:22px;}
+.kf-card--soft{
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+}
+
+/* Buttons */
+.kf-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration:none;
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
+  user-select:none;
+  white-space:nowrap;
+}
+.kf-btn:active{transform: translateY(0);}
+.kf-btn:hover{transform: translateY(-1px); box-shadow: 0 10px 25px rgba(37,99,235,.18);}
+.kf-btn--primary{background: linear-gradient(135deg, var(--kf-primary), var(--kf-primary-2)); color:white;}
+.kf-btn--secondary{background: var(--kf-surface); border-color: var(--kf-border); color: var(--kf-text);}
+.kf-btn--secondary:hover{border-color: rgba(37,99,235,.35); box-shadow: 0 10px 25px rgba(15,23,42,.08);}
+.kf-btn--warning{background: linear-gradient(135deg, #F59E0B, #F97316); color:white;}
+.kf-btn--danger{background: linear-gradient(135deg, #EF4444, #F97316); color:white;}
+.kf-btn--ghost{background: transparent; border-color: var(--kf-border); color: var(--kf-text);}
+
+/* Forms */
+.kf-input{
+  width:100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--kf-border);
+  background: var(--kf-surface);
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.kf-input:focus{
+  border-color: rgba(37,99,235,.55);
+  box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+}
+
+/* Chat */
+.kf-chat{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.kf-chat-item{
+  display:flex;
+  gap:12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--kf-surface-2);
+  border: 1px solid rgba(226,232,240,.9);
+}
+.kf-chat-avatar{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  flex-shrink:0;
+  background: linear-gradient(135deg, var(--kf-primary), var(--kf-primary-2));
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+.kf-chat-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 4px;
+}
+.kf-chat-name{font-weight:900;font-size:14px;color:var(--kf-text);}
+.kf-chat-time{font-size:12px;color: #94A3B8;}
+.kf-chat-text{margin:0;color:var(--kf-muted);font-size:14px;line-height:1.6;}
+
+/* Responsive tweaks (better spacing on mobile) */
+@media (max-width: 768px){
+  .kf-title{font-size:22px;}
+  .kf-card--padded{padding:16px;}
+}
+

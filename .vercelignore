@@ -1,0 +1,34 @@
+# Fichiers legacy Laravel / PHP / Flutter — exclus du déploiement Vercel
+backend/
+backend_php/
+laravel_app/
+bootstrap/
+config/
+resources/
+routes/
+storage/
+assets/
+.kiro/
+
+# Scripts utilitaires locaux
+*.bat
+*.ps1
+
+# Fichiers PHP racine
+*.php
+artisan
+
+# Fichiers SQL racine
+*.sql
+verify_database.sql
+
+# Documentation inutile en prod
+*.txt
+*.md
+!README.md
+
+# Vendor PHP
+vendor/
+
+# Dossier de build local (Vercel le recrée)
+# node_modules est déjà ignoré automatiquement

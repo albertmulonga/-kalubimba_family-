@@ -1,0 +1,31 @@
+{
+  "name": "Kalubimba Family",
+  "short_name": "Kalubimba",
+  "description": "Arbre généalogique, photos, vidéos et communication familiale.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B1220",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/pwa/icon/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa/icon/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
