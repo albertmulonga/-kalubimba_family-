@@ -32,21 +32,28 @@ export async function saveUpload(
   const key = `${folder}/${filename}`;
 
   if (isVercelBlob()) {
-    // Avec token explicite (ancien système)
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      // Avec token explicite (ancien système)
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const blob = await put(key, file, {
+          access: "public",
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+          addRandomSuffix: false,
+        });
+        console.log("[Blob] Upload réussi (token):", blob.url);
+        return blob.url;
+      }
+      // Avec OIDC (nouveau système Vercel — BLOB_STORE_ID présent)
       const blob = await put(key, file, {
         access: "public",
-        token: process.env.BLOB_READ_WRITE_TOKEN,
         addRandomSuffix: false,
       });
+      console.log("[Blob] Upload réussi (OIDC):", blob.url);
       return blob.url;
+    } catch (err) {
+      console.error("[Blob] Erreur upload:", err);
+      throw err;
     }
-    // Avec OIDC (nouveau système Vercel — BLOB_STORE_ID présent)
-    const blob = await put(key, file, {
-      access: "public",
-      addRandomSuffix: false,
-    });
-    return blob.url;
   }
 
   // Fallback local — stockage dans public/media
