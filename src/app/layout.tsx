@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./legacy.css";
+import { InstallApp } from "@/components/InstallApp";
 
 export const metadata: Metadata = {
   title: {
@@ -33,7 +34,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        <InstallApp />
+        {children}
+      </body>
     </html>
   );
 }

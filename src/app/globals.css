@@ -5645,3 +5645,186 @@ body {
   color: white;
   font-size: 0.9rem;
 }
+
+/* ──────────────────────────────────
+   BANDEAU INSTALLATION PWA
+   ────────────────────────────────── */
+.install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  background: #0f172a;
+  border-top: 1px solid #1e293b;
+  box-shadow: 0 -8px 30px -10px rgba(0,0,0,0.4);
+  animation: slideUpBanner 0.35s ease;
+}
+
+@keyframes slideUpBanner {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.install-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  display: grid;
+  place-items: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.install-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.install-banner-text strong {
+  display: block;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.install-banner-text span {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.76rem;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.install-banner-actions .icon-btn {
+  color: #64748b;
+  border-color: #1e293b;
+  background: transparent;
+}
+
+.install-banner-actions .icon-btn:hover {
+  background: #1e293b;
+  color: white;
+}
+
+/* Modal guide installation */
+.install-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(2,6,23,0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 0 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@media (min-width: 600px) {
+  .install-modal-backdrop {
+    align-items: center;
+    padding: 20px;
+  }
+}
+
+.install-modal {
+  width: min(480px, 100%);
+  background: white;
+  border-radius: 24px 24px 16px 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.5);
+  animation: slideUpModal 0.25s ease;
+}
+
+@media (min-width: 600px) {
+  .install-modal { border-radius: 20px; }
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.install-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.install-modal-head h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.install-modal-body {
+  padding: 16px 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.install-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.install-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.install-step strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #0f172a;
+  margin-bottom: 3px;
+}
+
+.install-step p {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.install-modal-foot {
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #f8fafc;
+}
+
+@media (max-width: 480px) {
+  .install-banner-text span { display: none; }
+  .install-banner { gap: 10px; padding: 12px 16px; }
+}
