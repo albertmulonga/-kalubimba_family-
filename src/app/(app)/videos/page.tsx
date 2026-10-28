@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { Film, Trash2, Upload, UserRound, Users } from "lucide-react";
+import { Film, Upload, UserRound, Users } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { getMembers, getVideos } from "@/lib/data";
 import { formatDate, fullName, mediaUrl } from "@/lib/format";
 import { readFlash } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
-import { ConfirmForm } from "@/components/ConfirmForm";
-import { MediaViewer } from "@/components/MediaViewer";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { deleteVideoAction, uploadVideoAction } from "@/lib/actions/memories";
 
 export const metadata = { title: "Vidéos de famille" };
@@ -26,6 +25,7 @@ export default async function VideosPage({
   return (
     <>
       <Alert success={flash.success} error={flash.error} info={flash.info} />
+
       <div className="page-head">
         <div>
           <h1>Vidéos de famille</h1>
@@ -35,7 +35,12 @@ export default async function VideosPage({
           </p>
         </div>
         <form action="/videos" method="get" className="row" style={{ gap: 8 }}>
-          <select name="member" className="select" defaultValue={memberId ?? ""} style={{ minWidth: 220 }}>
+          <select
+            name="member"
+            className="select"
+            defaultValue={memberId ?? ""}
+            style={{ minWidth: 220 }}
+          >
             <option value="">Tous les membres</option>
             {members.map((member) => (
               <option key={member.id} value={member.id}>
@@ -43,17 +48,14 @@ export default async function VideosPage({
               </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-ghost">
-            Filtrer
-          </button>
+          <button type="submit" className="btn btn-ghost">Filtrer</button>
           {memberId && (
-            <Link href="/videos" className="btn btn-ghost">
-              Réinitialiser
-            </Link>
+            <Link href="/videos" className="btn btn-ghost">Réinitialiser</Link>
           )}
         </form>
       </div>
 
+      {/* Formulaire upload */}
       <details className="card" style={{ marginBottom: 20 }}>
         <summary className="card-head" style={{ cursor: "pointer", listStyle: "none" }}>
           <div>
@@ -68,7 +70,14 @@ export default async function VideosPage({
           <div className="form-grid">
             <div className="field span-2">
               <label htmlFor="video">Vidéo *</label>
-              <input id="video" name="video" type="file" accept="video/*" className="input" required />
+              <input
+                id="video"
+                name="video"
+                type="file"
+                accept="video/*"
+                className="input"
+                required
+              />
             </div>
             <div className="field">
               <label htmlFor="description">Description</label>
@@ -98,45 +107,37 @@ export default async function VideosPage({
         </form>
       </details>
 
+      {/* Liste des vidéos */}
       {videos.length === 0 ? (
         <div className="card empty-state">
-          <div className="icon">
-            <Film />
-          </div>
+          <div className="icon"><Film /></div>
           <h3>Aucune vidéo pour le moment</h3>
           <p>Ajoutez le premier film de famille.</p>
         </div>
       ) : (
         <div className="video-grid">
           {videos.map((video) => {
-            const canDelete = session.isAdmin || video.utilisateur_id === session.id;
-            const uploader =
-              video.uploader_prenom || video.uploader_nom
-                ? `${video.uploader_prenom ?? ""} ${video.uploader_nom ?? ""}`.trim()
-                : null;
-            const associated =
-              video.member_prenom || video.member_nom
-                ? `${video.member_prenom ?? ""} ${video.member_nom ?? ""}`.trim()
-                : null;
-            const videoSrc = mediaUrl(video.video) ?? "";
+            const videoSrc = mediaUrl(video.video);
             if (!videoSrc) return null;
+
+            const canDelete = session.isAdmin || video.utilisateur_id === session.id;
+            const uploader = [video.uploader_prenom, video.uploader_nom]
+              .filter(Boolean)
+              .join(" ")
+              .trim() || null;
+            const associated = [video.member_prenom, video.member_nom]
+              .filter(Boolean)
+              .join(" ")
+              .trim() || null;
+
             return (
               <article key={video.id} className="video-card">
-                <MediaViewer
-                  kind="video"
+                <VideoPlayer
                   src={videoSrc}
                   title={video.description || "Vidéo de famille"}
-                  className="video-card-frame"
                   canDelete={canDelete}
                   deleteAction={deleteVideoAction.bind(null, video.id)}
-                >
-                  <video
-                    src={videoSrc}
-                    muted
-                    playsInline
-                    preload="none"
-                  />
-                </MediaViewer>
+                />
                 <div className="video-card-caption">
                   <div>
                     <strong>{video.description || "Vidéo de famille"}</strong>
@@ -144,15 +145,17 @@ export default async function VideosPage({
                       <span>{formatDate(video.date_publication)}</span>
                       {uploader && (
                         <span>
-                          <UserRound size={12} /> Publiée par {uploader}
+                          <UserRound size={12} /> {uploader}
                         </span>
                       )}
                       {associated && (
                         <span>
-                          <Users size={12} /> Associée à {associated}
+                          <Users size={12} /> {associated}
                         </span>
                       )}
-                      {video.duree && <span className="badge badge-blue">{video.duree}</span>}
+                      {video.duree && (
+                        <span className="badge badge-blue">{video.duree}</span>
+                      )}
                     </div>
                   </div>
                 </div>
