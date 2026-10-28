@@ -14,6 +14,11 @@ function safeName(name: string) {
   return cleaned || "fichier";
 }
 
+// Vercel Blob fonctionne avec BLOB_READ_WRITE_TOKEN (ancien) OU OIDC (nouveau, via BLOB_STORE_ID)
+function isVercelBlob(): boolean {
+  return !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+}
+
 export async function saveUpload(
   file: FormDataEntryValue | null,
   folder: string,
@@ -26,15 +31,25 @@ export async function saveUpload(
   const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}-${safeName(file.name)}`;
   const key = `${folder}/${filename}`;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (isVercelBlob()) {
+    // Avec token explicite (ancien système)
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(key, file, {
+        access: "public",
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        addRandomSuffix: false,
+      });
+      return blob.url;
+    }
+    // Avec OIDC (nouveau système Vercel — BLOB_STORE_ID présent)
     const blob = await put(key, file, {
       access: "public",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
       addRandomSuffix: false,
     });
     return blob.url;
   }
 
+  // Fallback local — stockage dans public/media
   const directory = path.join(process.cwd(), "public", "media", folder);
   await mkdir(directory, { recursive: true });
   const bytes = Buffer.from(await file.arrayBuffer());
@@ -48,6 +63,8 @@ export async function deleteStoredFile(filePath: string | null | undefined) {
     if (/^https?:\/\//i.test(filePath)) {
       if (process.env.BLOB_READ_WRITE_TOKEN) {
         await del(filePath, { token: process.env.BLOB_READ_WRITE_TOKEN });
+      } else if (process.env.BLOB_STORE_ID) {
+        await del(filePath);
       }
       return;
     }
