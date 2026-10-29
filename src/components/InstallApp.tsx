@@ -27,6 +27,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallApp() {
+  const [mounted, setMounted] = useState(false);
   const [platform, setPlatform] = useState<Platform>("unknown");
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
@@ -34,9 +35,10 @@ export function InstallApp() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     setPlatform(detectPlatform());
 
-    // Déjà installée ?
+    // Déjà installée en mode standalone ?
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setInstalled(true);
       return;
@@ -53,7 +55,6 @@ export function InstallApp() {
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
-
     window.addEventListener("appinstalled", () => {
       setInstalled(true);
       setDeferredPrompt(null);
@@ -62,8 +63,8 @@ export function InstallApp() {
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  // Déjà installée → ne rien afficher
-  if (installed || dismissed) return null;
+  // Ne rien rendre côté serveur (évite toute erreur d'hydratation)
+  if (!mounted || installed || dismissed) return null;
 
   // Bouton Chrome/Edge desktop & Android avec prompt natif
   async function handleInstallChrome() {
