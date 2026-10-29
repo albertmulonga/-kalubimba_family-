@@ -29,7 +29,8 @@ export async function updateProfileAction(formData: FormData) {
     }
   }
 
-  const photo = await saveUpload(formData.get("photo"), "members").catch(() => null);
+  const photo = await saveUpload(formData.get("photo"), "members").catch(() => null)
+    ?? (stringValue(formData.get("photo_url")) || null);
 
   await query(
     `UPDATE users SET nom=$1, prenom=$2, email=$3, telephone=$4, pays=$5, ville=$6,

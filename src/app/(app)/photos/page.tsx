@@ -8,6 +8,7 @@ import { Alert } from "@/components/Alert";
 import { ConfirmForm } from "@/components/ConfirmForm";
 import { MediaViewer } from "@/components/MediaViewer";
 import { SafeImage } from "@/components/SafeImage";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 import { deletePhotoAction, uploadPhotoAction } from "@/lib/actions/memories";
 
 export const metadata = { title: "Photos de famille" };

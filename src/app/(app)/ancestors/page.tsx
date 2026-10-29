@@ -7,6 +7,7 @@ import { Alert } from "@/components/Alert";
 import { Avatar } from "@/components/Avatar";
 import { ConfirmForm } from "@/components/ConfirmForm";
 import { createAncestorAction, deleteAncestorAction } from "@/lib/actions/memories";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 
 export const metadata = { title: "Ancêtres" };
 
@@ -62,10 +63,16 @@ export default async function AncestorsPage({
                 <label htmlFor="ordre">Ordre d&apos;affichage</label>
                 <input id="ordre" name="ordre" type="number" className="input" defaultValue={0} />
               </div>
-              <div className="field">
+                <div className="field">
                 <label htmlFor="photo">Photo</label>
-                <input id="photo" name="photo" type="file" accept="image/*" className="input" />
-              </div>
+                <CloudinaryFileInput
+                  name="photo_url"
+                  accept="image/*"
+                  cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                  uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                  folder="kalubimba/ancestors"
+                />
+                </div>
               <div className="field span-2">
                 <label htmlFor="description">Histoire / description</label>
                 <textarea id="description" name="description" className="textarea" />

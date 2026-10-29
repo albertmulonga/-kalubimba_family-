@@ -8,6 +8,7 @@ import { fullName } from "@/lib/format";
 import { readFlash, withMessage } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
 import { PasswordField } from "@/components/PasswordField";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 import { addChildAction } from "@/lib/actions/family";
 import { shouldCreateChildAccount } from "@/lib/family-rules";
 
@@ -99,7 +100,13 @@ export default async function AddChildPage({
             </div>
             <div className="field">
               <label htmlFor="photo">Photo</label>
-              <input id="photo" name="photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
             </div>
             {shouldCreateAccount ? (
               <>

@@ -4,6 +4,7 @@ import { getMembers } from "@/lib/data";
 import { readFlash } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
 import { createMemberAction } from "@/lib/actions/members";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 
 export const metadata = { title: "Ajouter un membre" };
 
@@ -74,7 +75,13 @@ export default async function NewMemberPage({
             </div>
             <div className="field">
               <label htmlFor="photo">Photo</label>
-              <input id="photo" name="photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
             </div>
             <div className="field">
               <label htmlFor="pere_id">Père (membre existant)</label>

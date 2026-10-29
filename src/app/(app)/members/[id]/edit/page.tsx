@@ -9,6 +9,7 @@ import { withMessage } from "@/lib/flash";
 import { readFlash } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
 import { updateMemberAction } from "@/lib/actions/members";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 
 export const metadata = { title: "Modifier un membre" };
 
@@ -156,7 +157,13 @@ export default async function EditMemberPage({
             </div>
             <div className="field">
               <label htmlFor="photo">Nouvelle photo</label>
-              <input id="photo" name="photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
               {photo && (
                 <label className="checkbox" style={{ marginTop: 6 }}>
                   <input type="checkbox" name="remove_photo" value="1" /> Supprimer la photo actuelle

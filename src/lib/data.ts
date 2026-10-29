@@ -540,3 +540,25 @@ export async function getNextBirthdays() {
     .filter((item) => item.days <= 30)
     .sort((a, b) => a.days - b.days);
 }
+
+export type VideoCommentRow = {
+  id: number;
+  video_id: number;
+  user_id: number;
+  contenu: string;
+  created_at: string;
+  user_nom: string | null;
+  user_prenom: string | null;
+  user_photo: string | null;
+};
+
+export async function getVideoComments(videoId: number): Promise<VideoCommentRow[]> {
+  return query<VideoCommentRow>(
+    `SELECT vc.*, u.nom AS user_nom, u.prenom AS user_prenom, u.photo AS user_photo
+     FROM video_comments vc
+     JOIN users u ON u.id = vc.user_id
+     WHERE vc.video_id = $1
+     ORDER BY vc.created_at ASC`,
+    [videoId],
+  );
+}

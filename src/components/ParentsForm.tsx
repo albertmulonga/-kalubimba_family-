@@ -3,6 +3,7 @@ import { Save, Users } from "lucide-react";
 import type { MemberRow } from "@/lib/data";
 import { dateInputValue, fullName } from "@/lib/format";
 import { addParentsAction } from "@/lib/actions/family";
+import { CloudinaryFileInput } from "./CloudinaryFileInput";
 
 export function ParentsForm({
   target,
@@ -62,7 +63,13 @@ export function ParentsForm({
             </div>
             <div className="field">
               <label htmlFor="pere_photo">Photo</label>
-              <input id="pere_photo" name="pere_photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="pere_photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
             </div>
           </div>
         </div>
@@ -113,7 +120,13 @@ export function ParentsForm({
             </div>
             <div className="field">
               <label htmlFor="mere_photo">Photo</label>
-              <input id="mere_photo" name="mere_photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="mere_photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { dateInputValue, fullName, mediaUrl } from "@/lib/format";
 import { readFlash, withMessage } from "@/lib/flash";
 import { Alert } from "@/components/Alert";
 import { addSpouseAction } from "@/lib/actions/family";
+import { CloudinaryFileInput } from "@/components/CloudinaryFileInput";
 
 export const metadata = { title: "Ajouter un conjoint" };
 
@@ -134,7 +135,13 @@ export default async function AddSpousePage({
             </div>
             <div className="field">
               <label htmlFor="spouse_photo">Photo</label>
-              <input id="spouse_photo" name="spouse_photo" type="file" accept="image/*" className="input" />
+              <CloudinaryFileInput
+                name="spouse_photo_url"
+                accept="image/*"
+                cloudName={process.env.CLOUDINARY_CLOUD_NAME ?? ""}
+                uploadPreset={process.env.CLOUDINARY_UPLOAD_PRESET ?? ""}
+                folder="kalubimba/members"
+              />
             </div>
             <div className="field">
               <label>Photo actuelle</label>

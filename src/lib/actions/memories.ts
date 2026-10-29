@@ -192,3 +192,30 @@ export async function saveVideoUrlAction(formData: FormData) {
 
   refreshMedia();
 }
+
+export async function addVideoCommentAction(videoId: number, formData: FormData) {
+  const session = await requireSession();
+  const contenu = stringValue(formData.get("contenu"));
+  if (!contenu || contenu.length < 1) {
+    redirect(withMessage(`/videos`, "error", "Le commentaire ne peut pas être vide."));
+  }
+  await query(
+    `INSERT INTO video_comments (video_id, user_id, contenu, created_at, updated_at)
+     VALUES ($1, $2, $3, now(), now())`,
+    [videoId, session.id, contenu],
+  );
+  revalidatePath("/videos");
+}
+
+export async function deleteVideoCommentAction(commentId: number) {
+  const session = await requireSession();
+  const row = await queryOne<{ user_id: number }>(
+    "SELECT user_id FROM video_comments WHERE id = $1",
+    [commentId],
+  );
+  if (!row || (!session.isAdmin && row.user_id !== session.id)) {
+    redirect(withMessage("/videos", "error", "Permission refusée."));
+  }
+  await query("DELETE FROM video_comments WHERE id = $1", [commentId]);
+  revalidatePath("/videos");
+}

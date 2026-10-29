@@ -40,6 +40,15 @@ export async function saveUpload(
   if (!file || typeof file === "string" || file.size === 0) return null;
   if (file.size > MAX_SIZE) throw new Error("Fichier trop volumineux (max 50 Mo).");
 
+  // Si le fichier dépasse 4MB sur Vercel serverless → on ne peut pas l'envoyer
+  // via Server Action (limite 4.5MB). On retourne null silencieusement.
+  // L'URL doit être fournie via un champ caché (upload client-side Cloudinary).
+  const IS_VERCEL = !!process.env.VERCEL;
+  if (IS_VERCEL && file.size > 4 * 1024 * 1024) {
+    console.warn("[storage] Fichier trop grand pour Vercel Server Action, ignoré:", file.name, file.size);
+    return null;
+  }
+
   if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET) {
     const url = await uploadToCloudinary(file as File, folder);
     console.log("[Cloudinary] OK:", url);

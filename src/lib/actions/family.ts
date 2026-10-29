@@ -76,8 +76,10 @@ export async function addParentsAction(formData: FormData) {
     redirect(withMessage(`/family-tree/add-parents?member_id=${targetId}`, "error", "Renseignez au moins un parent."));
   }
 
-  const fatherPhoto = await saveUpload(formData.get("pere_photo"), "photos").catch(() => null);
-  const motherPhoto = await saveUpload(formData.get("mere_photo"), "photos").catch(() => null);
+  const fatherPhoto = await saveUpload(formData.get("pere_photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("pere_photo_url")) || null);
+  const motherPhoto = await saveUpload(formData.get("mere_photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("mere_photo_url")) || null);
 
   try {
     await transaction(async (client) => {
@@ -225,7 +227,9 @@ export async function addChildAction(formData: FormData) {
   const profession = stringValue(formData.get("profession"));
   const nomPere = stringValue(formData.get("nom_pere"));
   const nomMere = stringValue(formData.get("nom_mere"));
-  const photo = await saveUpload(formData.get("photo"), "photos").catch(() => null);
+  const photo = await saveUpload(formData.get("photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("photo_url")) || null);
+
   const requestedPassword = stringValue(formData.get("mot_de_passe_enfant"));
   const passwordConfirmation = stringValue(
     formData.get("mot_de_passe_enfant_confirmation"),
@@ -372,7 +376,8 @@ export async function addSpouseAction(formData: FormData) {
   const adresse = stringValue(formData.get("spouse_adresse"));
   const nomPere = stringValue(formData.get("spouse_nom_pere"));
   const nomMere = stringValue(formData.get("spouse_nom_mere"));
-  const photo = await saveUpload(formData.get("spouse_photo"), "photos").catch(() => null);
+  const photo = await saveUpload(formData.get("spouse_photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("spouse_photo_url")) || null);
 
   const spouseBloodline = target.genre === "male" && target.is_bloodline;
 

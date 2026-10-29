@@ -42,7 +42,8 @@ export async function createMemberAction(formData: FormData) {
   const mereId = Number(formData.get("mere_id")) || null;
   const isBloodline = formData.get("is_bloodline") === "1";
 
-  const photo = await saveUpload(formData.get("photo"), "photos").catch(() => null);
+  const photo = await saveUpload(formData.get("photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("photo_url")) || null);
 
   const created = await queryOne<{ id: number }>(
     `INSERT INTO members
@@ -119,7 +120,8 @@ export async function updateMemberAction(memberId: number, formData: FormData) {
   const isBloodline = formData.get("is_bloodline") === "1";
   const removePhoto = formData.get("remove_photo") === "1";
 
-  const newPhoto = await saveUpload(formData.get("photo"), "photos").catch(() => null);
+  const newPhoto = await saveUpload(formData.get("photo"), "photos").catch(() => null)
+    ?? (stringValue(formData.get("photo_url")) || null);
 
   const current = await queryOne<{ photo: string | null }>(
     "SELECT photo FROM members WHERE id = $1",
