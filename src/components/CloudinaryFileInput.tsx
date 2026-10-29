@@ -51,7 +51,7 @@ export function CloudinaryFileInput({
       const fd = new FormData();
       fd.append("file", file);
       fd.append("upload_preset", uploadPreset);
-      fd.append("folder", folder);
+      // Ne pas envoyer folder — laisse Cloudinary utiliser le dossier du preset
 
       const xhr = new XMLHttpRequest();
       xhr.upload.onprogress = (ev) => {
