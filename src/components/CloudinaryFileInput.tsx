@@ -85,7 +85,10 @@ export function CloudinaryFileInput({
       setProgress(100);
       setUrl(resultUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur upload");
+      // Si Cloudinary échoue → on affiche l'erreur mais on permet quand même
+      // de continuer sans photo (le champ hidden restera vide)
+      const msg = err instanceof Error ? err.message : "Erreur upload";
+      setError(`${msg} — Vous pouvez continuer sans photo.`);
     } finally {
       setUploading(false);
     }
