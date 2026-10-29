@@ -39,6 +39,14 @@ export function CloudinaryFileInput({
     setProgress(0);
     setUrl(null);
 
+    // Si pas de config Cloudinary → on stocke juste le fichier localement
+    // (le serveur Next.js le traitera via saveUpload)
+    if (!cloudName || !uploadPreset) {
+      setUploading(false);
+      // On laisse le fichier dans l'input natif — la Server Action le lira
+      return;
+    }
+
     try {
       const fd = new FormData();
       fd.append("file", file);
@@ -58,11 +66,19 @@ export function CloudinaryFileInput({
             const data = JSON.parse(xhr.responseText);
             resolve(data.secure_url as string);
           } else {
-            reject(new Error(`Erreur Cloudinary ${xhr.status}`));
+            // Afficher l'erreur exacte de Cloudinary
+            try {
+              const errData = JSON.parse(xhr.responseText);
+              reject(new Error(`Cloudinary: ${errData?.error?.message ?? xhr.status}`));
+            } catch {
+              reject(new Error(`Erreur Cloudinary ${xhr.status}`));
+            }
           }
         };
         xhr.onerror = () => reject(new Error("Erreur réseau."));
-        xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`);
+        // Forcer "image" pour les photos (évite erreur 400 avec "auto")
+        const type = accept?.includes("video") ? "video" : "image";
+        xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/${type}/upload`);
         xhr.send(fd);
       });
 
